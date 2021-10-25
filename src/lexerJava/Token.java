@@ -9,8 +9,7 @@ public class Token {
         this.tokenType = tokenType;
     }
 
-    @Override
     public String toString(){
-        return tokenType + ": " + tokenAttribute;
+        return tokenAttribute + " - " + tokenType;
     }
 }

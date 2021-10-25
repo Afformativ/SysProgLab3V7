@@ -9,9 +9,20 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Lexer {
+    private final static String identifier = "^([a-zA-Z_$])([a-zA-Z_$0-9])*$";
+    private final static String number = "\\b\\d+|\\b\\d+.\\d+|\\b\\d+e\\d+|0[xX][0-9a-fA-F]+";
+    private final static String punctuator = "(\\(|\\)|\\[|]|\\{|}|,|:|;|\\.)";
+    private final static String operator = "(\\+|-|\\*|/|=|%|\\+\\+|--|==|!=|>|<|>=|<=|&|\\||^" +
+            "|~|<<|>>|>>>|&&|\\|\\||!|\\+=|-=|\\*=|/=|%=)";
+    private final static String reserved = "abstract|assert|boolean|break|byte|case|catch|char|class|" +
+            "const|continue|default|do|double|else|enum|extends|final|finally|float|for|goto|if|implements|" +
+            "import|instanceof|int|interface|long|native|new|package|private|protected|public|return|short|" +
+            "static|strictfp|String|string|super|switch|synchronized|this|throw|throws|transient|try|void|volatile|while";
+    private final static String annotation = "@Override|@Deprecated|@SuppressWarnings|@SafeVarargs" +
+            "@Retention|@Documented|@Target|@Inherited";
+    private final static String literals = "true|false|null";
     private final ArrayList<Token> tokens;
     private boolean inComment = false;
-
     public Lexer(File file) throws FileNotFoundException {
         Scanner scanner = new Scanner(file);
         tokens = new ArrayList<>();
@@ -19,8 +30,6 @@ public class Lexer {
             eatLine(scanner.nextLine());
         }
     }
-
-    @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
         for (Token token : tokens) {
@@ -29,7 +38,14 @@ public class Lexer {
         }
         return builder.toString();
     }
-
+    private int matchString(String pattern, String string, int index) {
+        Pattern p = Pattern.compile(pattern);
+        Matcher m = p.matcher(string);
+        if (m.find(index)) {
+            return m.end();
+        } else
+            return -1;
+    }
     private void eatLine(String line) {
         int i = 0;
         int index;
@@ -40,7 +56,6 @@ public class Lexer {
                 }
                 i++;
             }
-
             if (inComment) {
                 if ((index = matchString("\\*/", line, i)) != -1) {
                     i = index;
@@ -105,7 +120,7 @@ public class Lexer {
                         i++;
                     }
                 } else {
-                    while (i < line.length() && !line.substring(i, i + 1).matches("\\s") &&
+                        while (i < line.length() && !line.substring(i, i + 1).matches("\\s") &&
                             !line.substring(i, i + 1).matches(punctuator) && !line.substring(i, i + 1).matches(operator)) {
                         i++;
                     }
@@ -128,28 +143,4 @@ public class Lexer {
 
         }
     }
-
-    private int matchString(String pattern, String string, int index) {
-        Pattern p = Pattern.compile(pattern);
-        Matcher m = p.matcher(string);
-        if (m.find(index)) {
-            return m.end();
-        } else
-            return -1;
-
-    }
-
-
-    private final static String identifier = "^([a-zA-Z_$])([a-zA-Z_$0-9])*$";
-    private final static String number = "\\b\\d+|\\b\\d+.\\d+|\\b\\d+e\\d+|0[xX][0-9a-fA-F]+";
-    private final static String punctuator = "(\\(|\\)|\\[|]|\\{|}|,|:|;|\\.)";
-    private final static String operator = "(\\+|-|\\*|/|=|%|\\+\\+|--|==|!=|>|<|>=|<=|&|\\||^" +
-            "|~|<<|>>|>>>|&&|\\|\\||!|\\+=|-=|\\*=|/=|%=)";
-    private final static String reserved = "abstract|assert|boolean|break|byte|case|catch|char|class|" +
-            "const|continue|default|do|double|else|enum|extends|final|finally|float|for|goto|if|implements|" +
-            "import|instanceof|int|interface|long|native|new|package|private|protected|public|return|short|" +
-            "static|strictfp|super|switch|synchronized|this|throw|throws|transient|try|void|volatile|while";
-    private final static String annotation = "@Override|@Deprecated|@SuppressWarnings|@SafeVarargs" +
-            "@Retention|@Documented|@Target|@Inherited";
-    private final static String literals = "true|false|null";
 }

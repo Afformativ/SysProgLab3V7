@@ -1,4 +1,5 @@
 package test;
+import java.io.File;
 /*
 "abcdef"
  */
@@ -16,6 +17,6 @@ public class Main{
         String sdsd = "sdfsf";
         System.out.println("sdf");
         String _abc = "abcd//abcd";
-        String //sdfsdf = ""ssdf;
+        true
     }
 }
